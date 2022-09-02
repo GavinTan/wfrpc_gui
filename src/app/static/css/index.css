@@ -1,0 +1,51 @@
+.form-control-xs {
+  height: calc(1em + .375rem + 10px) !important;
+  padding: .125rem .25rem !important;
+  font-size: .75rem !important;
+}
+
+table {
+  border-collapse: separate;
+  text-align: center;
+}
+
+.table-wrapper-scroll-y {
+  height: calc(100vh - 250px);
+  overflow-y: hidden;
+}
+
+.table-wrapper-scroll-y:hover {
+  overflow-y: overlay;
+}
+
+.table-wrapper-scroll-y::-webkit-scrollbar {
+  width: 6px;
+  height: 10px;
+}
+
+.table-wrapper-scroll-y::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background-color: #aaa;
+}
+
+.table-wrapper-scroll-y::-webkit-scrollbar-track {
+  overflow: hidden;
+}
+
+.table-wrapper-scroll-y::-webkit-scrollbar-track:hover {
+  overflow: auto;
+  width: 15px;
+  border-radius: 6px;
+  background-color: #eee;
+
+}
+
+.text-blink {
+  animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}

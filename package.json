@@ -1,0 +1,65 @@
+{
+  "name": "wfrpc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "wfrpc图形客户端",
+  "author": "Gavin <mr.tanwen@gmail.com>",
+  "homepage": "https://github.com/GavinTan/wfrpc_gui",
+  "license": "Apache-2.0",
+  "main": "./src/main.js",
+  "scripts": {
+    "start": "node download-wfrpc.js && electron .",
+    "build": "node download-wfrpc.js && electron-builder -p never",
+    "release": "node download-wfrpc.js -a && electron-builder -wlm -p never",
+    "release:arm64": "node download-wfrpc.js -a -y --arm64 && electron-builder -p never -lm --arm64",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.electron.wfrpc",
+    "artifactName": "${productName}_gui-${version}-${arch}.${ext}",
+    "files": [
+      "!wfprc",
+      "!download-wfrpc.js"
+    ],
+    "win": {
+      "target": "nsis",
+      "extraResources": {
+        "from": "./wfrpc/windows/wfrpc.exe",
+        "to": "wfrpc.exe"
+      }
+    },
+    "mac": {
+      "target": "dmg",
+      "extraResources": {
+        "from": "./wfrpc/darwin/wfrpc",
+        "to": "wfrpc"
+      }
+    },
+    "linux": {
+      "target": [
+        "rpm",
+        "deb",
+        "AppImage"
+      ],
+      "extraResources": {
+        "from": "./wfrpc/linux/wfrpc",
+        "to": "wfrpc"
+      }
+    },
+    "nsis": {
+      "artifactName": "${productName}_gui-${version}-setup-${arch}.${ext}"
+    }
+  },
+  "devDependencies": {
+    "download": "^8.0.0",
+    "electron": "^20.1.1",
+    "electron-builder": "^23.3.3",
+    "eslint": "^8.22.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "meow": "8.1.1"
+  },
+  "dependencies": {
+    "js-ini": "^1.5.1"
+  }
+}

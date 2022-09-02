@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+
+      - name: install rpm
+        if: runner.os == 'macOS'
+        run: rpmbuild --version || brew install -q rpm
+
+      - name: yarn install
+        run: yarn
+
+      - name: build
+        run: yarn release && yarn release:arm64
+
+      - run: mv dist release
+
+      - name: Create Tag
+        if:
+        run: |
+          version=`node -p "require('./package.json').version"`
+          git tag "v$version"
+          git push origin "v$version"
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}

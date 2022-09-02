@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+
+  <link href="static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="static/css/index.css" rel="stylesheet">
+
+<body>
+  <div class="container p-0">
+    <!-- Content here -->
+    <div class="row">
+      <div class="col-sm-8" style="margin-top: 36px;">
+        <div class="row g-3 align-items-center">
+          <div class="col-auto">
+            <label for="server_addr" class="col-form-label col-auto">服务器地址:</label>
+          </div>
+          <div class="col-8">
+            <input class="form-control form-control-xs" id="server_addr" type="text">
+          </div>
+        </div>
+        <div class="row g-3 align-items-center">
+          <div class="col-auto">
+            <label for="server_port" class="col-form-label">服务器端口:</label>
+          </div>
+          <div class="col-8">
+            <input class="form-control form-control-xs" id="server_port" type="text"
+            onkeyup="this.value=this.value.replace(/\D/g,'')">
+          </div>
+        </div>
+        <div class="row g-3 align-items-center">
+          <div class="col-auto">
+            <label for="token" class="col-form-label">服务器密码:</label>
+          </div>
+          <div class="col-8">
+            <input class="form-control form-control-xs" id="token" type="password" placeholder="默认空">
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-4 mt-1">
+        <div class="d-grid gap-2 float-end">
+          <a id="start" type="button" class="btn btn-outline-primary btn-sm">开启Frp</a>
+          <a id="stop" type="button" class="btn btn-outline-primary btn-sm">关闭Frp</a>
+          <a id="add" type="button" class="btn btn-outline-primary btn-sm">添加转发</a>
+          <a id="edit" type="button" class="btn btn-outline-primary btn-sm">编辑配置</a>
+          <a id="clear" type="button" class="btn btn-outline-primary btn-sm">清理配置</a>
+        </div>
+
+      </div>
+
+      <div class="col-sm-12 mt-3">
+        <div class="table-wrapper-scroll-y">
+          <table class="table" id="table" cellspacing="0">
+            <thead class="sticky-top border-dark bg-white">
+              <tr>
+                <th >#</th>
+                <th scope="col">转发端口</th>
+                <th scope="col">访问端口</th>
+                <th scope="col">状态</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <!-- <textarea rows="12" class="form-control" id="log" style="resize:none;font-size:13px;" ></textarea> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="fixed-bottom border-top" style="font-size:14px;">
+    <span id="showtext" class="text-secondary ms-1" spellcheck="false"></span>
+    <!-- <span class="d-none float-end text-success me-2 text-blink" id="showrunning">running</span> -->
+    <a class="float-end me-2" href="#" id="showlog">运行日志</a>
+  </div>
+
+
+  <div class="modal" tabindex="-1" id="addModal">
+    <div class="modal-dialog" style="width: 400px;">
+      <div class="modal-content">
+        <div class="modal-body">
+          <form>
+            <div class="form-group mb-3">
+              <label for="local_ip">目标IP:</label>
+              <input type="text" class="form-control form-control-sm float-end w-75" id="local_ip" autofocus required>
+            </div>
+            <div class="form-group mb-3">
+              <label for="local_port">目标端口:</label>
+              <input type="text" class="form-control form-control-sm float-end w-75" id="local_port"
+                onkeyup="this.value=this.value.replace(/\D/g,'')" required>
+            </div>
+            <div class="form-group mb-3">
+              <label for="remote_port">转发端口:</label>
+              <input type="text" class="form-control form-control-sm float-end w-75" id="remote_port"
+                onkeyup="this.value=this.value.replace(/\D/g,'')" placeholder="默认随机端口">
+            </div>
+            <div class="form-group">
+              <label for="type">端口类型:</label>
+              <select class="form-control form-control-sm float-end w-75" id="type">
+                <option value="tcp">tcp</option>
+                <option value="udp">udp</option>
+              </select>
+            </div>
+            <div class="p-3"></div>
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+              <button id="submit" type="submit" class="btn btn-primary">提交</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" tabindex="-1" id="logModal">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-body p-0">
+        <textarea class="form-control" rows="17" readonly id="log" style="font-family: monospace;font-size: 12px;"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="static/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="static/js/index.js"></script>
+</body>
+
+</html>
