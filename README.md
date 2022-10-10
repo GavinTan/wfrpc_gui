@@ -1,5 +1,5 @@
 # wfrpc_gui
-[wfrpc](https://github.com/gavintan/wfrpc)图形客户端
+[frp](https://github.com/gavintan/wfrpc)图形客户端
 
 
 
