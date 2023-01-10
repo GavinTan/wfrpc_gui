@@ -120,10 +120,15 @@ const createMainWindow = () => {
     runWfrpc?.kill();
   });
 
+  win.on('show', () => {
+    win.setMinimumSize(600, 550);
+  });
+
   win.on('minimize', (event) => {
     event.preventDefault();
     win.hide();
     win.setSkipTaskbar(true);
+    win.setMinimumSize(456, 550);
     if (sysPlatform === 'darwin') app.dock.hide();
     // new Notification({ body: 'wfrpc已经后台运行' }).show();
   });
