@@ -9,6 +9,9 @@ const {
   nativeImage,
 } = require('electron');
 
+let mainWindow;
+const gotTheLock = app.requestSingleInstanceLock({ k: 'wrfpc_gui' });
+
 const { spawn } = require('child_process');
 const path = require('path');
 const ini = require('js-ini');
@@ -96,7 +99,7 @@ const handleWfrpcConfig = (event, data) => {
   fs.writeFileSync(wfrpcConfigFile, iniData);
 };
 
-const mainWindow = () => {
+const createMainWindow = () => {
   const win = new BrowserWindow({
     width: 600,
     height: 550,
@@ -170,21 +173,34 @@ const mainWindow = () => {
       if (sysPlatform === 'darwin') app.dock.show();
     }
   });
+
+  return win;
 };
 
-app.whenReady().then(() => {
-  ipcMain.on('addConfig', handleWfrpcConfig);
-  ipcMain.handle('startWfrpc', handleStartWfrpc);
-  ipcMain.handle('stopWfrpc', handleStopWfrpc);
-  ipcMain.handle('editWfrpc', () => shell.openPath(wfrpcConfigFile));
-  ipcMain.handle('clearWfrpc', (event) => {
-    fs.truncateSync(wfrpcConfigFile);
-    dialog.showMessageBox(BrowserWindow.fromWebContents(event.sender), { message: '配置文件已清空', type: 'info' });
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.show();
+      mainWindow.focus();
+    }
   });
 
-  mainWindow();
-});
+  app.whenReady().then(() => {
+    ipcMain.on('addConfig', handleWfrpcConfig);
+    ipcMain.handle('startWfrpc', handleStartWfrpc);
+    ipcMain.handle('stopWfrpc', handleStopWfrpc);
+    ipcMain.handle('editWfrpc', () => shell.openPath(wfrpcConfigFile));
+    ipcMain.handle('clearWfrpc', (event) => {
+      fs.truncateSync(wfrpcConfigFile);
+      dialog.showMessageBox(BrowserWindow.fromWebContents(event.sender), { message: '配置文件已清空', type: 'info' });
+    });
 
-app.on('window-all-closed', () => {
-  app.quit();
-});
+    mainWindow = createMainWindow();
+  });
+
+  app.on('window-all-closed', () => {
+    app.quit();
+  });
+}
