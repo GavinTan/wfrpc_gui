@@ -10,6 +10,8 @@ checksum:
     - glob: ./release/*.rpm
     - glob: ./release/*.deb
     - glob: ./release/*.AppImage
+    - glob: ./release/*.blockmap
+    - glob: ./release/latest*.yml
 release:
   # Same as for github
   # Note: it can only be one: either github, gitlab or gitea
@@ -29,3 +31,5 @@ release:
     - glob: ./release/*.rpm
     - glob: ./release/*.deb
     - glob: ./release/*.AppImage
+    - glob: ./release/*.blockmap
+    - glob: ./release/latest*.yml
