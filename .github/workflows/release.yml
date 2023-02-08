@@ -8,7 +8,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v3
         with:
@@ -17,7 +19,9 @@ jobs:
 
       - name: install rpm
         if: runner.os == 'macOS'
-        run: rpmbuild --version || brew install -q rpm
+        run: |
+          rpmbuild --version || wget -q https://raw.githubusercontent.com/GavinTan/files/master/picgo/rpm.rb && brew install -q rpm.rb
+          rm -rf rpm.rb
 
       - name: yarn install
         run: yarn
@@ -28,16 +32,17 @@ jobs:
       - run: mv dist release
 
       - name: Create Tag
-        if:
         run: |
-          version=`node -p "require('./package.json').version"`
-          git tag "v$version"
-          git push origin "v$version"
+          version=v`node -p "require('./package.json').version"`
+          if [ ! $(git tag -l $version) ]; then
+            git tag $version
+            git push origin $version
+          fi
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v3
+        uses: goreleaser/goreleaser-action@v4
         with:
           version: latest
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
