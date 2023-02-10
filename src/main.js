@@ -8,25 +8,25 @@ const {
   Menu,
   nativeImage,
 } = require('electron');
-
-let mainWindow;
-const gotTheLock = app.requestSingleInstanceLock({ k: 'wrfpc_gui' });
-
+const { autoUpdater } = require('electron-updater');
 const { spawn } = require('child_process');
 const path = require('path');
 const ini = require('js-ini');
 const fs = require('fs');
 const homedir = require('os').homedir();
+const { homepage } = require('../package.json');
 
+let mainWindow;
 let runWfrpc;
 let configData = { common: {} };
+
 const sysData = { x64: 'amd64', ia32: '386', win32: 'windows' };
 const sysPlatform = sysData[process.platform] || process.platform;
-
 const wfrpcBasePath = path.join(homedir, '/.wfrpc');
 const wfrpcConfigFile = path.join(wfrpcBasePath, 'wfrpc.ini');
 const wfrpcBinName = sysPlatform === 'windows' ? 'wfrpc.exe' : 'wfrpc';
 const wfrpcBin = app.isPackaged ? path.join(process.resourcesPath, wfrpcBinName) : path.join('wfrpc', sysPlatform, wfrpcBinName);
+const gotTheLock = app.requestSingleInstanceLock({ k: 'wrfpc_gui' });
 
 const handleStartWfrpc = (event) => {
   const webContents = event.sender;
@@ -201,8 +201,46 @@ if (!gotTheLock) {
       fs.truncateSync(wfrpcConfigFile);
       dialog.showMessageBox(BrowserWindow.fromWebContents(event.sender), { message: '配置文件已清空', type: 'info' });
     });
+    ipcMain.handle('downloadUpdate', (event, version) => {
+      dialog.showMessageBox({
+        title: '提示',
+        message: `发现新版本v${version}!`,
+        type: 'info',
+        buttons: ['更新', '查看'],
+        noLink: true,
+        cancelId: -1,
+      }).then(({ response }) => {
+        if (response === 0) autoUpdater.downloadUpdate();
+        if (response === 1) shell.openExternal(`${homepage}/releases/v${version}`);
+      });
+    });
 
     mainWindow = createMainWindow();
+
+    // check update
+    autoUpdater.autoDownload = false;
+    autoUpdater.checkForUpdates();
+
+    autoUpdater.on('update-available', (info) => {
+      mainWindow.webContents.send('wfrpc:update:version', info.version);
+    });
+
+    autoUpdater.on('download-progress', (progressObj) => {
+      mainWindow.webContents.send('wfrpc:update:download:progress', progressObj.percent);
+    });
+
+    autoUpdater.on('update-downloaded', () => {
+      dialog.showMessageBox({
+        title: '提示',
+        message: '下载完成，是否退出更新?',
+        type: 'info',
+        buttons: ['是', '否'],
+        noLink: true,
+        cancelId: -1,
+      }).then(({ response }) => {
+        if (response === 0) autoUpdater.quitAndInstall();
+      });
+    });
   });
 
   app.on('window-all-closed', () => {

@@ -58,4 +58,29 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('server_port').value = config.server_port || '';
     document.getElementById('token').value = config.token || '';
   });
+
+  ipcRenderer.on('wfrpc:update:version', (_event, version) => {
+    const a = document.createElement('a');
+    a.className = 'text-danger ms-1 text-blink';
+    a.href = '#';
+    a.innerText = `新版本: v${version}`;
+    a.onclick = () => {
+      ipcRenderer.invoke('downloadUpdate', version);
+    };
+
+    document.getElementById('showtext').before(a);
+  });
+
+  ipcRenderer.on('wfrpc:update:download:progress', (_event, progress) => {
+    const div = document.createElement('div');
+    div.className = 'progress';
+    div.style.height = '3px';
+    div.innerHTML = '<div class="progress-bar bg-success" id="progress"></div>';
+
+    if (!document.getElementById('progress')) {
+      document.body.prepend(div);
+    }
+
+    document.getElementById('progress').style.width = `${progress}%`;
+  });
 });
